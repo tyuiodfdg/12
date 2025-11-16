@@ -4524,6 +4524,10 @@ class NewsAnalyzer:
         try:
             self._initialize_and_check_config()
 
+            # 如果爬虫功能被禁用，直接退出
+            if not CONFIG["ENABLE_CRAWLER"]:
+                return
+
             mode_strategy = self._get_mode_strategy()
 
             results, id_to_name, failed_ids = self._crawl_data()
@@ -4536,7 +4540,11 @@ class NewsAnalyzer:
 
 
 def main():
+    global CONFIG
     try:
+        # 每次运行时重新加载配置，确保Docker环境下配置文件修改能生效
+        CONFIG = load_config()
+        print(f"TrendRadar v{VERSION} 配置重新加载完成")
         analyzer = NewsAnalyzer()
         analyzer.run()
     except FileNotFoundError as e:
